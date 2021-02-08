@@ -59,7 +59,7 @@ def getAll(): # RETORNA LA FILA ENTERA
 @app.route('/next', methods=['GET'])
 def handleNext():
     nextq = newQ.dequeue() # APLICAR DEQUEUE A A LA INSTANCIA
-    return jsonify({"msg": "processed! next in line please..."}, nextq), 200
+    return jsonify({"msg": "processed! next in line is..."}, nextq), 200
 
 
 
