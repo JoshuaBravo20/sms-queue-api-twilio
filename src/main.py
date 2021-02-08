@@ -2,23 +2,21 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
+from twilio.rest import Client
 from flask import Flask, request, jsonify, url_for
-from flask_migrate import Migrate
+from flask_migrate import Migrate, MigrateCommand
 from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
-from admin import setup_admin
-from models import db, User
+from models import Queue
 #from models import Person
 
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_CONNECTION_STRING')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-MIGRATE = Migrate(app, db)
-db.init_app(app)
 CORS(app)
-setup_admin(app)
+
 
 # Handle/serialize errors like a JSON object
 @app.errorhandler(APIException)
@@ -30,14 +28,43 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/user', methods=['GET'])
-def handle_hello():
+newQ = Queue() # INSTANCIA NUEVA Y UNICA DE LA CLASE QUEUE
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
+@app.route('/new', methods=['POST'])
+def handleNew(): # RECIBE DATOS Y LOS TRANSFIERE A ENQUEUE()
 
-    return jsonify(response_body), 200
+    name = request.json.get('name') # CAPTURAR VALOR DE NOMBRE
+
+    if not name: # VALIDAR NOMBRE
+        return jsonify({"msg": "name is required"}), 400
+
+    item = {
+        "name": name
+    } # DEFINIR EL DICT
+
+    newQ.enqueue(item) # APLICAR LA FUNCIÓN DE INGRESAR A LA FILA
+
+    return jsonify({"sent": "message has been sent!"}), 201
+
+
+
+@app.route('/all', methods=['GET'])
+def getAll(): # RETORNA LA FILA ENTERA
+
+    q = newQ.get_queue() # APLICAR FUNCION DE RETORNAR FILA ENTERA A LA INSTANCIA
+    return jsonify(q), 200 
+
+
+
+@app.route('/next', methods=['GET'])
+def handleNext():
+    nextq = newQ.dequeue()
+    return jsonify({"msg": "processed! next in line please..."}, nextq), 200
+
+
+
+
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
