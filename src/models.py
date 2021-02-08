@@ -24,10 +24,10 @@ class Queue: # CLASE PRINCIPAL
 
     def dequeue(self): # SACAR DE FILA
         if self.size() > 0:
-            if self._mode == 'FIFO':
+            if self._mode == 'FIFO': # SI ES FIFO, ELIMINAR EL ULTIMO
                 deQ = self._queue.pop()
                 return deQ
-            elif self._mode == 'LIFO':
+            elif self._mode == 'LIFO': # SI ES LIFO, ELIMIAR EL PRIMERO
                 deQ = self._queue.pop(0)
                 return deQ
         else:
@@ -35,5 +35,6 @@ class Queue: # CLASE PRINCIPAL
 
     def get_queue(self): # RETORNAR FILA COMPLETA
         return self._queue
+
     def size(self): # RETORNAR TAMANO DE FILA
         return len(self._queue)
