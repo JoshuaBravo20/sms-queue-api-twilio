@@ -26,12 +26,30 @@ class Queue: # CLASE PRINCIPAL
         if self.size() > 0:
             if self._mode == 'FIFO': # SI ES FIFO, ELIMINAR EL ULTIMO
                 deQ = self._queue.pop()
-                return deQ
+                name = deQ.get('name')
+                message = self.client.messages.create(
+                body='It is your turn, ' + str(name) + '!',
+                from_='+19713154952',
+                to='+56930734399'
+                ) # MANDAR SMS
+                return name
+                return message.sid
+
             elif self._mode == 'LIFO': # SI ES LIFO, ELIMIAR EL PRIMERO
                 deQ = self._queue.pop(0)
-                return deQ
+                name = deQ.get('name')
+                message = self.client.messages.create(
+                body='It is your turn, ' + str(name) + '!',
+                from_='+19713154952',
+                to='+56930734399'
+                ) # MANDAR SMS
+                return name
+                return message.sid
         else:
-            return 'no one in line...'
+            noOneRemaining = {
+                "msg": "no one in line...!"
+            }
+            return noOneRemaining
 
     def get_queue(self): # RETORNAR FILA COMPLETA
         return self._queue
